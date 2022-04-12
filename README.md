@@ -1,4 +1,4 @@
-## Автодеплой через GitHub Webhooks
+## Автодеплой через GitHub Webhooks для Neti 1C Academy
 
 ### Настройка
 
@@ -19,8 +19,9 @@
 cp deployer.service.template /etc/systemd/system/deployer.service
 ```
 
-6. В скопированном файле с конфигом сервиса `deployer.service` указать полный 
-путь до скрипта `service.sh`
+6. В скопированном файле с конфигом сервиса `deployer.service` в строке 
+`ExecStart=/bin/bash /full/path/to/service.sh` заменить `/full/path/to/service.sh` на полный 
+путь до скрипта `service.sh` (`/bin/bash` не удалять)
 
 7. Активировать сервис
 ```shell
