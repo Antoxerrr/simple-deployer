@@ -43,9 +43,9 @@ def github_webhook():
     request_data = request.get_json()
 
     # Проверяем название репозитория на всякий случай
-    # if request_data.get('repository', {}).get('name') != REPO_NAME:
-    #     logging.info('Неизвестный репозиторий')
-    #     return "Don't care"
+    if request_data.get('repository', {}).get('name') != REPO_NAME:
+        logging.info('Неизвестный репозиторий')
+        return "Don't care"
 
     if need_to_update(request_data):
         thread = threading.Thread(target=update)
