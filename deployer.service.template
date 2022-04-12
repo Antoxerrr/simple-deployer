@@ -1,0 +1,11 @@
+[Unit]
+Description=Simple App Deployer
+After=multi-user.target
+
+[Service]
+Type=idle
+ExecStart=
+Restart=always
+
+[Install]
+WantedBy=multi-user.target
