@@ -25,6 +25,6 @@ cp deployer.service.template /etc/systemd/system/deployer.service
 7. Активировать сервис
 ```shell
 sudo systemctl daemon-reload
-sudo systemctl enable bot.service
-sudo systemctl start bot.service
+sudo systemctl enable deployer.service
+sudo systemctl start deployer.service
 ```
