@@ -4,7 +4,6 @@ After=network.target
 
 [Service]
 WorkingDirectory=/full/path/to/project
-Environment="PATH=/root/full/path/to/project/virtualenv/bin"
 ExecStart=/bin/bash /full/path/to/project/service.sh
 
 [Install]

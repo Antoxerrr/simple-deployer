@@ -30,19 +30,12 @@ cp deployer.service.template /etc/systemd/system/deployer.service
 
 7. В скопированном файле с конфигом сервиса `deployer.service` в строке 
 `WorkingDirectory=/full/path/to/project` заменить `/full/path/to/project` на полный 
-путь до корня проекта
+путь до корня проекта 
 
 
-8. В скопированном файле с конфигом сервиса `deployer.service` в строке 
-`Environment="PATH=/root/full/path/to/project/virtualenv/bin"` заменить 
-`/root/full/path/to/project/virtualenv/bin` на полный путь до папки `bin` виртуального окружения, 
-созданного pipenv (`PATH=` не удалять). По умолчанию pipenv создает окружения в папке `~/.local/share/virtualenvs`
+8. В скрипте `update.sh` в команде `cd` указать полный путь до обновляемого проекта
 
-
-9. В скрипте `update.sh` в команде `cd` указать полный путь до обновляемого проекта
-
-
-10. Активировать сервис
+9. Активировать сервис
 ```shell
 sudo systemctl daemon-reload
 sudo systemctl enable deployer.service
