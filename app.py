@@ -53,6 +53,7 @@ def github_webhook():
         return "Don't care"
 
     if need_to_update(request_data):
+        logging.info('Нужно обновить')
         thread = threading.Thread(target=update)
         thread.start()
     else:
