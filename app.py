@@ -55,6 +55,8 @@ def github_webhook():
     if need_to_update(request_data):
         thread = threading.Thread(target=update)
         thread.start()
+    else:
+        logging.info('Не нужно обновлять')
 
     logging.info('Success')
     return 'ok'
