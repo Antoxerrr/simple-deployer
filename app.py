@@ -21,6 +21,11 @@ GITHUB_SECRET = env_values.get('GITHUB_SECRET')
 REPO_NAME = 'Academy'
 
 
+@app.route('/ping')
+def ping():
+    return 'pong'
+
+
 @app.route('/github-webhook', methods=['POST'])
 def github_webhook():
     """Эндпоинт для гитхаб вебхука."""
