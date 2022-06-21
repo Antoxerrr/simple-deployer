@@ -29,7 +29,7 @@ app = Flask(__name__)
 GITHUB_SECRET = env_values.get('GITHUB_SECRET')
 REPO_NAME = 'Academy'
 CONFIG_FILE_PATH = os.path.join(PROJECT_DIR, 'instances.toml')
-CONFIG = parse_config(CONFIG_FILE_PATH)
+CONFIG = parse_config(CONFIG_FILE_PATH).get('config')
 
 
 @app.route('/ping')
@@ -80,12 +80,12 @@ def get_update_path(request_data) -> Union[str, None]:
     # Пытаемся из конфига достать путь до проекта по
     # названию ветки. Если достать не получилось, значит
     # обновлять проект не нужно.
-    config_data = CONFIG.get(pull_request_base)
+    path = CONFIG.get(pull_request_base)
     # Пулл реквест слили
     pull_request_merged = request_data.get('pull_request', {}).get('merged')
     # Если ПР слили в нужную ветку, возвращаем путь
-    if pull_request_merged and config_data:
-        return config_data.get('project_path')
+    if pull_request_merged and path:
+        return path
 
 
 def update():
