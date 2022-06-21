@@ -34,7 +34,6 @@ CONFIG_FILE_PATH = os.path.join(PROJECT_DIR, 'instances.toml')
 
 @app.route('/ping')
 def ping():
-    update('sgffgfsg', 'sfdfsd', 'fsdf')
     return 'pong'
 
 
