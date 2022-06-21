@@ -1,7 +1,13 @@
 #!/bin/bash
 
-cd /root/apps/Academy && git pull \
+if ! cd "$1" ; then
+    echo "Failed to enter folder $1"
+    exit 1
+fi
+
+
+git pull origin $2 \
   && docker-compose down \
-  && docker volume rm academy_static_volume \
+  && docker volume rm $3 \
   && docker-compose build --no-cache \
   && docker-compose up -d

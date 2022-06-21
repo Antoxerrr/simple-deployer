@@ -5,6 +5,7 @@ import os.path
 import subprocess
 import threading
 import traceback
+from functools import partial
 from pathlib import Path
 from typing import Union
 
@@ -29,7 +30,7 @@ app = Flask(__name__)
 GITHUB_SECRET = env_values.get('GITHUB_SECRET')
 REPO_NAME = 'Academy'
 CONFIG_FILE_PATH = os.path.join(PROJECT_DIR, 'instances.toml')
-CONFIG = parse_config(CONFIG_FILE_PATH).get('config')
+CONFIG = parse_config(CONFIG_FILE_PATH)
 
 
 @app.route('/ping')
@@ -63,10 +64,14 @@ def github_webhook():
         logging.info('Неизвестный репозиторий')
         return "Don't care"
 
-    update_path = get_update_path(request_data)
-    if update_path:
+    instance, branch = get_update_path(request_data)
+    if instance:
         logging.info('Нужно обновить')
-        thread = threading.Thread(target=update)
+        _update = partial(
+            update, instance.get('project_path'), branch,
+            instance.get('static_volume_name')
+        )
+        thread = threading.Thread(target=_update)
         thread.start()
     else:
         logging.info('Не нужно обновлять')
@@ -75,24 +80,25 @@ def github_webhook():
     return 'ok'
 
 
-def get_update_path(request_data) -> Union[str, None]:
+def get_update_path(request_data) -> tuple:
     pull_request_base = request_data.get('pull_request', {}).get('base', {}).get('ref')
-    # Пытаемся из конфига достать путь до проекта по
+    # Пытаемся из конфига достать данные обновляемого проекта по
     # названию ветки. Если достать не получилось, значит
     # обновлять проект не нужно.
-    path = CONFIG.get(pull_request_base)
+    instance = CONFIG.get(pull_request_base)
     # Пулл реквест слили
     pull_request_merged = request_data.get('pull_request', {}).get('merged')
-    # Если ПР слили в нужную ветку, возвращаем путь
-    if pull_request_merged and path:
-        return path
+    # Если ПР слили в нужную ветку, возвращаем данные для обновления
+    if pull_request_merged and instance:
+        return instance, pull_request_base
+    return None, pull_request_base
 
 
-def update():
+def update(path, branch, static_volume_name):
     """Вызывает bash скрипт пересборки контейнеров"""
     script_path = str(os.path.join(SOURCES_DIR, 'update.sh'))
     try:
-        subprocess.call(f'.{script_path}')
+        subprocess.call(f'.{script_path} {path} {branch} {static_volume_name}')
     except Exception:
         exc = traceback.format_exc()
         msg = 'Ошибка во время выполнения bash скрипта: \n' + exc
