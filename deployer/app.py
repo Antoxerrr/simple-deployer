@@ -91,7 +91,7 @@ def get_update_path(request_data) -> Union[str, None]:
 def update():
     """Вызывает bash скрипт пересборки контейнеров"""
     try:
-        subprocess.call('./../update.sh')
+        subprocess.call('./update.sh')
     except Exception:
         exc = traceback.format_exc()
         msg = 'Ошибка во время выполнения bash скрипта: \n' + exc
