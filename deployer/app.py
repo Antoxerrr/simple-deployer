@@ -30,7 +30,6 @@ app = Flask(__name__)
 GITHUB_SECRET = env_values.get('GITHUB_SECRET')
 REPO_NAME = 'Academy'
 CONFIG_FILE_PATH = os.path.join(PROJECT_DIR, 'instances.toml')
-CONFIG = parse_config(CONFIG_FILE_PATH)
 
 
 @app.route('/ping')
@@ -85,7 +84,7 @@ def get_update_path(request_data) -> tuple:
     # Пытаемся из конфига достать данные обновляемого проекта по
     # названию ветки. Если достать не получилось, значит
     # обновлять проект не нужно.
-    instance = CONFIG.get(pull_request_base)
+    instance = parse_config(CONFIG_FILE_PATH).get(pull_request_base)
     # Пулл реквест слили
     pull_request_merged = request_data.get('pull_request', {}).get('merged')
     # Если ПР слили в нужную ветку, возвращаем данные для обновления
@@ -98,8 +97,9 @@ def update(path, branch, static_volume_name):
     """Вызывает bash скрипт пересборки контейнеров"""
     script_path = str(os.path.join(SOURCES_DIR, 'update.sh'))
     try:
-        subprocess.call(
-            f'bash {script_path} {path} {branch} {static_volume_name}'
+        subprocess.run(
+            ['bash', script_path, path, branch, static_volume_name],
+            capture_output=True
         )
     except Exception:
         exc = traceback.format_exc()
