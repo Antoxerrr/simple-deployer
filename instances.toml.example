@@ -1,0 +1,4 @@
+# Имя ветки в git
+[main]
+# Путь до docker-compose развернутого проекта, который нужно обновлять
+project_path = "/path/to/project"

@@ -1,24 +1,35 @@
 import logging
 import hashlib
 import hmac
+import os.path
 import subprocess
 import threading
 import traceback
+from pathlib import Path
+from typing import Union
 
 from flask import Flask, request, abort
 from dotenv import dotenv_values
 
+from deployer.config import parse_config
+
+SOURCES_DIR = Path(__file__).resolve().parent
+PROJECT_DIR = SOURCES_DIR.parent
+
+
 logging.basicConfig(
     format='%(levelname)s: %(asctime)s %(message)s', level=logging.DEBUG,
-    filename='logs.log', encoding='utf-8'
+    filename=os.path.join(PROJECT_DIR, 'logs.log'), encoding='utf-8'
 )
 
-env_values = dotenv_values('.env')
+env_values = dotenv_values(os.path.join(PROJECT_DIR, '.env'))
 
 app = Flask(__name__)
 
 GITHUB_SECRET = env_values.get('GITHUB_SECRET')
 REPO_NAME = 'Academy'
+CONFIG_FILE_PATH = os.path.join(PROJECT_DIR, 'instances.toml')
+CONFIG = parse_config(CONFIG_FILE_PATH)
 
 
 @app.route('/ping')
@@ -52,7 +63,8 @@ def github_webhook():
         logging.info('Неизвестный репозиторий')
         return "Don't care"
 
-    if need_to_update(request_data):
+    update_path = get_update_path(request_data)
+    if update_path:
         logging.info('Нужно обновить')
         thread = threading.Thread(target=update)
         thread.start()
@@ -63,23 +75,23 @@ def github_webhook():
     return 'ok'
 
 
-def need_to_update(request_data):
-    """Разбирает payload от гитхаба и проверяет, нужно ли обновляться."""
+def get_update_path(request_data) -> Union[str, None]:
     pull_request_base = request_data.get('pull_request', {}).get('base', {}).get('ref')
-    # Ветка пулл реквеста = main
-    pull_request_base_is_main = pull_request_base == 'main'
+    # Пытаемся из конфига достать путь до проекта по
+    # названию ветки. Если достать не получилось, значит
+    # обновлять проект не нужно.
+    config_data = CONFIG.get(pull_request_base)
     # Пулл реквест слили
     pull_request_merged = request_data.get('pull_request', {}).get('merged')
-    pull_request_merged_to_main = pull_request_base_is_main and pull_request_merged
-    # Произошел пуш в main
-    pushed_to_main = request_data.get('ref') == 'refs/heads/main'
-    return pull_request_merged_to_main or pushed_to_main
+    # Если ПР слили в нужную ветку, возвращаем путь
+    if pull_request_merged and config_data:
+        return config_data.get('project_path')
 
 
 def update():
     """Вызывает bash скрипт пересборки контейнеров"""
     try:
-        subprocess.call('./update.sh')
+        subprocess.call('./../update.sh')
     except Exception:
         exc = traceback.format_exc()
         msg = 'Ошибка во время выполнения bash скрипта: \n' + exc
