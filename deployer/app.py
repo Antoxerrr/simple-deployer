@@ -98,7 +98,9 @@ def update(path, branch, static_volume_name):
     """Вызывает bash скрипт пересборки контейнеров"""
     script_path = str(os.path.join(SOURCES_DIR, 'update.sh'))
     try:
-        subprocess.call(f'.{script_path} {path} {branch} {static_volume_name}')
+        subprocess.call(
+            f'bash {script_path} {path} {branch} {static_volume_name}'
+        )
     except Exception:
         exc = traceback.format_exc()
         msg = 'Ошибка во время выполнения bash скрипта: \n' + exc
