@@ -97,10 +97,8 @@ def update(path, branch, static_volume_name):
     """Вызывает bash скрипт пересборки контейнеров"""
     script_path = str(os.path.join(SOURCES_DIR, 'update.sh'))
     try:
-        result = subprocess.run(
-            ['bash', script_path, path, branch, static_volume_name],
-            capture_output=True,
-            check=True
+        result = subprocess.call(
+            ['bash', script_path, path, branch, static_volume_name]
         )
     except Exception as exc:
         if hasattr(exc, 'stderr'):
