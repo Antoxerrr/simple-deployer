@@ -34,6 +34,7 @@ CONFIG_FILE_PATH = os.path.join(PROJECT_DIR, 'instances.toml')
 
 @app.route('/ping')
 def ping():
+    update('sgffgfsg', 'sfdfsd', 'fsdf')
     return 'pong'
 
 
@@ -97,12 +98,16 @@ def update(path, branch, static_volume_name):
     """Вызывает bash скрипт пересборки контейнеров"""
     script_path = str(os.path.join(SOURCES_DIR, 'update.sh'))
     try:
-        subprocess.run(
+        result = subprocess.run(
             ['bash', script_path, path, branch, static_volume_name],
-            capture_output=True
+            capture_output=True,
+            check=True
         )
-    except Exception:
-        exc = traceback.format_exc()
+    except Exception as exc:
+        if hasattr(exc, 'stderr'):
+            exc = exc.stderr.decode()
+        else:
+            exc = traceback.format_exc()
         msg = 'Ошибка во время выполнения bash скрипта: \n' + exc
         logging.error(msg)
 
