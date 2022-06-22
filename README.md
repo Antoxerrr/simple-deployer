@@ -17,7 +17,10 @@
 3. Создать и заполнить `.env` файл из `.env.example`
 
 
-4. Положить шаблон systemd юнита в папку с сервисами
+4. Создать и заполнить файл конфига `instances.toml` из `instances.toml.example`
+
+
+5. Положить шаблон systemd юнита в папку с сервисами
 ```shell
 cp deployer.service.template /etc/systemd/system/deployer.service
 ```
