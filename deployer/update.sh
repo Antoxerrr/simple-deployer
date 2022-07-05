@@ -5,9 +5,7 @@ if ! cd "$1" ; then
     exit 1
 fi
 
-
-git pull origin $2 \
-  && docker-compose down \
-  && docker volume rm $3 \
-  && docker-compose build --no-cache \
-  && docker-compose up -d
+git pull origin $2
+docker-compose rm -sf app
+docker-compose build --no-cache app
+docker-compose up -d app
