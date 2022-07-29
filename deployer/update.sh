@@ -9,4 +9,4 @@ git pull origin $2
 docker-compose rm -sf app
 docker-compose build --no-cache app
 docker-compose up -d app
-docker system prune -a
+docker system prune -af
